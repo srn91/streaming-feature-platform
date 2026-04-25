@@ -4,13 +4,7 @@ A production-style data platform that ingests event streams, computes online and
 
 ## Why this project exists
 
-This project is designed to match what current hiring teams screen for in:
-
-- Data Engineering
-- Machine Learning Engineering
-- AI / ML platform roles
-
-It is intentionally built around the kinds of problems that show up in modern data platform work:
+This project focuses on the kinds of problems that show up in real-world data platform work:
 
 - streaming ingestion
 - batch backfills
@@ -84,18 +78,13 @@ streaming-feature-platform/
 └── tests/
 ```
 
-## Learning-first build plan
+## Project docs
 
-This project is being built so that you can both:
+For more detail:
 
-- show it on GitHub
-- explain it clearly in interviews
-
-Start here:
-
-1. [docs/learning-roadmap.md](/Users/sathwikraonadipelli/Desktop/RESUMES/projects/streaming-feature-platform/docs/learning-roadmap.md)
-2. [docs/milestones.md](/Users/sathwikraonadipelli/Desktop/RESUMES/projects/streaming-feature-platform/docs/milestones.md)
-3. [docs/interview-guide.md](/Users/sathwikraonadipelli/Desktop/RESUMES/projects/streaming-feature-platform/docs/interview-guide.md)
+1. [docs/architecture.md](/Users/sathwikraonadipelli/Desktop/RESUMES/projects/streaming-feature-platform/docs/architecture.md)
+2. [docs/learning-roadmap.md](/Users/sathwikraonadipelli/Desktop/RESUMES/projects/streaming-feature-platform/docs/learning-roadmap.md)
+3. [docs/milestones.md](/Users/sathwikraonadipelli/Desktop/RESUMES/projects/streaming-feature-platform/docs/milestones.md)
 
 ## Initial tech stack
 
@@ -127,7 +116,8 @@ Before running the project locally:
 Recommended commands:
 
 ```bash
-cd /Users/sathwikraonadipelli/Desktop/RESUMES/projects/streaming-feature-platform
+git clone git@github.com:srn91/streaming-feature-platform.git
+cd streaming-feature-platform
 python3 -m pip install -r requirements.txt
 open -a Docker
 ```
@@ -137,6 +127,8 @@ Wait until Docker Desktop is fully started before running `docker compose`.
 If your machine has multiple Python versions and one of them causes package build problems, use Python 3.12 explicitly:
 
 ```bash
+git clone git@github.com:srn91/streaming-feature-platform.git
+cd streaming-feature-platform
 /usr/local/bin/python3.12 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
@@ -146,7 +138,8 @@ python -m pip install -r requirements.txt
 ## Quick start
 
 ```bash
-cd /Users/sathwikraonadipelli/Desktop/RESUMES/projects/streaming-feature-platform
+git clone git@github.com:srn91/streaming-feature-platform.git
+cd streaming-feature-platform
 make setup
 make up
 make produce
@@ -241,36 +234,12 @@ Version 1 should be small but real:
 - a reconciliation report
 - a crisp README with screenshots and tradeoffs
 
-## How to explain this project
+## Roadmap
 
-Use this short version first:
+Planned follow-up work:
 
-`I built a production-style streaming feature platform that ingests events through Redpanda, stores raw data in DuckDB, materializes online and offline features, serves low-latency lookups through Redis and FastAPI, and validates freshness plus online/offline consistency.`
-
-Then expand on three points:
-
-1. `Why it matters`
-   This project is about avoiding training-serving skew and proving that feature values are trustworthy, not just moving data from one place to another.
-2. `What makes it production-style`
-   It includes schema-version checks, duplicate/null validation, freshness thresholds, historical versus latest snapshot reporting, and reconciliation between Redis and DuckDB.
-3. `How I would scale it`
-   The local version uses Python, Redpanda, Redis, and DuckDB for fast iteration, but the same design can evolve into Spark/Flink, Parquet/lakehouse storage, orchestration, and observability in production.
-
-## Interview prompts
-
-Be ready to answer these quickly:
-
-1. What is training-serving skew, and how does this repo reduce it?
-2. Why keep both online and offline feature stores?
-3. What happens when an event schema changes?
-4. Why do `total_feature_snapshots` and `latest_snapshot_entities` differ?
-5. What would you replace first if this had to handle much higher throughput?
-
-## Next step
-
-Implement Milestone 1:
-
-- local stack
-- sample events
-- schema definitions
-- ingestion path
+- richer streaming feature definitions
+- batch backfill workflows
+- stronger schema compatibility policies
+- metrics and observability for freshness and latency
+- higher-throughput execution with Spark or Flink style processing
