@@ -1,0 +1,44 @@
+{
+  "family": "streaming-feature-platform",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "arn:aws:iam::<account-id>:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::<account-id>:role/streamingFeaturePlatformTaskRole",
+  "containerDefinitions": [
+    {
+      "name": "api",
+      "image": "ghcr.io/srn91/streaming-feature-platform:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8010,
+          "hostPort": 8010,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {"name": "HOSTED_DEMO", "value": "1"},
+        {"name": "DEMO_SEED_USERS", "value": "12"},
+        {"name": "DEMO_EVENTS_PER_USER", "value": "16"},
+        {"name": "DEMO_SAMPLE_EVENTS_PATH", "value": "data/generated/sample_events.jsonl"}
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/streaming-feature-platform",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "api"
+        }
+      },
+      "healthCheck": {
+        "command": ["CMD-SHELL", "curl -f http://localhost:8010/health || exit 1"],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 15
+      }
+    }
+  ]
+}

@@ -1,10 +1,12 @@
 from contextlib import asynccontextmanager
+from time import perf_counter
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response
 
 from src.config import settings
 from src.demo.bootstrap import bootstrap_hosted_demo
 from src.features.offline_store import latest_feature_snapshot
+from src.observability.metrics import observe_request, render_metrics, update_quality_metrics, update_training_metrics
 from src.features.online_store import read_feature_snapshot
 from src.quality.checks import build_quality_summary
 from src.training.export_dataset import export_training_dataset_as_dict
@@ -25,6 +27,19 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="streaming-feature-platform", lifespan=lifespan)
 
 
+@app.middleware("http")
+async def metrics_middleware(request: Request, call_next):
+    started_at = perf_counter()
+    response = await call_next(request)
+    observe_request(
+        method=request.method,
+        path=request.url.path,
+        status_code=response.status_code,
+        duration_seconds=perf_counter() - started_at,
+    )
+    return response
+
+
 @app.get("/")
 def root(request: Request) -> dict[str, object]:
     demo_bootstrap = getattr(request.app.state, "demo_bootstrap", None)
@@ -33,7 +48,7 @@ def root(request: Request) -> dict[str, object]:
         "status": "running",
         "mode": "hosted_demo" if settings.hosted_demo else "local_full_stack",
         "demo_bootstrapped": demo_bootstrap is not None,
-        "available_endpoints": ["/health", "/features/{entity_id}", "/quality/summary", "/training-dataset/summary"],
+        "available_endpoints": ["/health", "/features/{entity_id}", "/quality/summary", "/training-dataset/summary", "/metrics"],
         "example_entity_id": "user_0001",
     }
 
@@ -61,9 +76,19 @@ def get_features(entity_id: str) -> dict[str, object]:
 
 @app.get("/quality/summary")
 def quality_summary() -> dict[str, object]:
-    return build_quality_summary()
+    summary = build_quality_summary()
+    update_quality_metrics(summary)
+    return summary
 
 
 @app.get("/training-dataset/summary")
 def training_dataset_summary() -> dict[str, object]:
-    return export_training_dataset_as_dict()
+    summary = export_training_dataset_as_dict()
+    update_training_metrics(summary)
+    return summary
+
+
+@app.get("/metrics")
+def metrics() -> Response:
+    payload, content_type = render_metrics()
+    return Response(content=payload, media_type=content_type)

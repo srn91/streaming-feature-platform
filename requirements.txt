@@ -5,6 +5,7 @@ confluent-kafka==2.5.3
 pandas==2.2.2
 pydantic==2.8.2
 pydantic-settings==2.4.0
+prometheus-client==0.21.0
 pytest==8.3.2
 redis==5.0.8
 ruff==0.6.1

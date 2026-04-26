@@ -1,47 +1,20 @@
 # streaming-feature-platform
 
-An end-to-end feature platform that ingests event streams, materializes online and offline features, reconciles consistency under streaming updates, and serves low-latency features to downstream ML systems.
+An end-to-end feature platform that ingests event streams, materializes online and offline features, reconciles consistency under streaming updates, serves low-latency feature reads, and exposes operational metrics for downstream ML systems.
 
-This project focuses on a real production failure mode: stale, inconsistent, or schema-broken features reaching training and inference systems. When online and offline feature values drift apart, teams get bad predictions, misleading experiments, and hard-to-debug regressions in production.
+This repo focuses on a production failure mode that directly affects ranking, recommendation, and inference systems: stale or inconsistent features reaching training and online scoring paths at different times.
 
-## Production Problem
+## Problem
 
-The real problem is keeping online and offline feature values aligned while the source data is still changing.
+Feature platforms are useful only when the same feature logic can be trusted in three places at once:
 
-This repo shows that operational loop in a concrete way:
+- streaming ingestion and feature updates
+- online serving for low-latency reads
+- offline snapshots for training, backfills, and debugging
 
-- stream events into Redpanda
-- materialize the same feature logic into DuckDB and Redis
-- compare freshness, schema compatibility, and reconciliation
-- expose a serving API that downstream inference clients can trust
+When any one of those paths drifts, teams get training-serving skew, brittle experiments, and silent regressions in production models.
 
-## Hosted demo mode
-
-Render runs this repo in `HOSTED_DEMO=1` mode.
-
-In that mode the app:
-
-- seeds deterministic sample events from local fixtures at startup
-- materializes offline feature snapshots into DuckDB
-- serves the existing read-only FastAPI endpoints
-- does not require a live Redpanda or Redis stack
-
-That keeps the hosted demo honest: it shows the platform outputs, not the entire local infrastructure.
-
-## Project goals
-
-By the end of this project, the repo should demonstrate:
-
-1. event ingestion through Kafka or Redpanda
-2. streaming feature computation
-3. offline feature generation for training and backfills
-4. online feature serving through Redis
-5. dataset and feature quality checks
-6. schema compatibility handling
-7. a simple consumer service that reads features for inference
-8. observability for freshness, latency, and data drift
-
-## Target architecture
+## Architecture
 
 ```mermaid
 flowchart LR
@@ -59,29 +32,27 @@ flowchart LR
     I --> K["Training / inference clients"]
 ```
 
-See [docs/architecture.md](docs/architecture.md) for the detailed system design.
+Operationally, the repo has two execution modes:
 
-Operationally, the flow is:
+1. full local stack with Redpanda, Redis, DuckDB, and FastAPI
+2. hosted demo mode that bootstraps deterministic sample events and serves the same read-only API surface without provisioning the entire stream
 
-1. application or synthetic events arrive
-2. Redpanda buffers the stream
-3. a consumer writes raw events into DuckDB
-4. feature materialization updates offline snapshots and the Redis online store
-5. quality checks compare freshness and online/offline consistency
-6. FastAPI serves the latest feature state to clients
+## Current Capabilities
 
-## Current status
+This repo currently supports:
 
-This repo already runs end to end locally:
+- event production into Redpanda
+- raw event persistence in DuckDB
+- feature materialization into DuckDB and Redis
+- online feature serving through FastAPI
+- offline training-dataset export from the latest snapshot plus event-derived labels
+- schema compatibility checks and freshness/reconciliation validation
+- Prometheus-style metrics at `GET /metrics`
+- container, Kubernetes, AWS ECS, Azure Container Apps, and Jenkins deployment assets for the hosted-demo service path
 
-- synthetic events are published into Redpanda
-- raw events are persisted into DuckDB
-- feature snapshots are materialized into offline and online stores
-- FastAPI serves feature lookup and quality status
-- a training dataset export is produced from the latest offline snapshot plus event-derived labels
-- validation, schema compatibility, freshness, and online/offline reconciliation are exposed through the API
+## Run Steps
 
-The most portable local run sequence is:
+### Full local stack
 
 ```bash
 make setup
@@ -93,9 +64,9 @@ make export-training
 make test
 ```
 
-That is the path a reviewer should use on any laptop with Docker and Python installed.
+### Hosted demo mode
 
-For the Render-hosted demo, use:
+For the hosted-demo code path, use:
 
 ```bash
 HOSTED_DEMO=1 make serve
@@ -108,15 +79,17 @@ That path bootstraps deterministic events, materializes offline features, and se
 - `GET /features/{entity_id}`
 - `GET /quality/summary`
 - `GET /training-dataset/summary`
+- `GET /metrics`
 
-Current browser endpoints:
+### Browser endpoints
 
 - `http://localhost:8010/`
 - `http://localhost:8010/features/user_0001`
 - `http://localhost:8010/quality/summary`
 - `http://localhost:8010/training-dataset/summary`
+- `http://localhost:8010/metrics`
 
-## Repo structure
+## Repo Layout
 
 ```text
 streaming-feature-platform/
@@ -132,15 +105,7 @@ streaming-feature-platform/
 └── tests/
 ```
 
-## Project docs
-
-For more detail:
-
-1. [docs/architecture.md](docs/architecture.md)
-2. [docs/learning-roadmap.md](docs/learning-roadmap.md)
-3. [docs/milestones.md](docs/milestones.md)
-
-## Initial tech stack
+## Stack
 
 - Python 3.11+
 - Redpanda or Kafka
@@ -151,23 +116,11 @@ For more detail:
 - Pydantic
 - Docker Compose
 - pytest
-
-Optional later:
-
-- Spark Structured Streaming
-- dbt
-- Great Expectations or Soda
-- Prometheus + Grafana
+- Prometheus metrics
 
 ## Prerequisites
 
-Before running the project locally:
-
-1. install Python dependencies
-2. make sure Docker Desktop is running
-3. prefer Python 3.12 or 3.13 for local setup
-
-Recommended commands:
+Recommended local setup:
 
 ```bash
 git clone https://github.com/srn91/streaming-feature-platform.git
@@ -177,13 +130,6 @@ open -a Docker
 ```
 
 Wait until Docker Desktop is fully started before running `docker compose`.
-
-Before running the hosted demo on Render:
-
-1. use the blueprint in [`render.yaml`](render.yaml)
-2. set `HOSTED_DEMO=1`
-3. keep the start command as `make serve`
-4. do not provision Redpanda or Redis for the hosted service
 
 If your machine has multiple Python versions and one of them causes package build problems, use Python 3.12 explicitly:
 
@@ -196,26 +142,29 @@ python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-## Quick start
+## Local API
 
 ```bash
-git clone https://github.com/srn91/streaming-feature-platform.git
-cd streaming-feature-platform
-make setup
-make up
-make produce
-make consume
-make materialize
-make export-training
+make serve
 ```
-
-`make setup` is pinned to Python 3.12 so the native `duckdb` and `confluent-kafka` wheels install cleanly on a reviewer laptop.
 
 API will be exposed at:
 
 `http://localhost:8010`
 
-On Render, the same API is exposed on the service URL Render assigns.
+## Cloud and Infrastructure Assets
+
+The repo includes deployment and operations assets for the hosted-demo service path:
+
+- `Dockerfile` for a single-container FastAPI deployment
+- `docker-compose.yml` for the local multi-service stack
+- `infra/kubernetes/` for a small Deployment + Service + ConfigMap
+- `infra/aws/ecs-task-definition.json` for an ECS/Fargate-style deployment
+- `infra/azure/container-app.yaml` for Azure Container Apps
+- `infra/observability/prometheus.yml` for scraping `/metrics`
+- `Jenkinsfile` for a simple install/lint/test/container-build pipeline
+
+These assets are intentionally scoped to the read-only hosted-demo path. The full local developer stack still uses Docker Compose with Redpanda and Redis.
 
 ## Hosted Deployment
 
@@ -236,28 +185,31 @@ Browser-friendly endpoints:
 - `http://localhost:8010/features/user_0001`
 - `http://localhost:8010/quality/summary`
 - `http://localhost:8010/training-dataset/summary`
+- `http://localhost:8010/metrics`
 
-Quality checks currently include:
+## Validation
+
+The repo currently verifies:
 
 - raw event volume and entity coverage
-- historical feature row count versus latest snapshot coverage
-- supported schema version enforcement
-- explicit schema compatibility reporting with accepted and rejected versions
+- latest feature snapshot coverage
+- schema version enforcement
 - duplicate and null-field validation
-- freshness lag with configurable warning and error thresholds
-- online/offline reconciliation against Redis
-- training-dataset export built from the latest offline snapshot plus purchase labels from raw events
+- freshness lag and online/offline reconciliation
+- training-dataset export from the latest offline snapshot plus purchase labels
+- Prometheus metrics emission for API traffic, quality summaries, and training-dataset exports
+
+Local quality gates:
+
+- `ruff check src tests`
+- `pytest tests`
+- `make test`
 
 To run the tests:
 
 ```bash
 make test
 ```
-
-If Docker is not running:
-
-- the producer and consumer will not be able to connect to Redpanda
-- feature materialization will run, but it will show `0 feature snapshots` if no raw events were successfully ingested first
 
 If dependency installation fails:
 
@@ -274,7 +226,7 @@ Render deployment notes:
 - the hosted demo is read-only and artifact-backed
 - the hosted demo uses deterministic fixtures, so the output is stable across redeploys
 - the hosted reconciliation section is expected to report Redis as skipped, because the hosted demo does not provision the online store
-- the hosted quality summary includes schema compatibility details so reviewers can see exactly which schema versions were accepted or rejected
+- the hosted quality summary includes schema compatibility details so you can inspect which schema versions were accepted or rejected
 
 Key env knobs:
 

@@ -18,3 +18,5 @@ jobs:
         run: ruff check src tests
       - name: Run tests
         run: pytest tests
+      - name: Build container
+        run: docker build -t streaming-feature-platform:ci .
