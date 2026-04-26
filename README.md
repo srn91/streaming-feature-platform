@@ -1,30 +1,8 @@
 # streaming-feature-platform
 
-A production-style data platform that ingests event streams, computes online and offline features, validates feature consistency, and serves low-latency features for downstream ML systems.
+An end-to-end feature platform that ingests event streams, materializes online and offline features, reconciles consistency under streaming updates, and serves low-latency features to downstream ML systems.
 
-## Why this project exists
-
-This project focuses on the kinds of problems that show up in real-world data platform work:
-
-- streaming ingestion
-- batch backfills
-- online and offline feature consistency
-- schema evolution
-- data quality and reconciliation
-- feature freshness and serving reliability
-
-## Hosted demo mode
-
-Render should run this repo in `HOSTED_DEMO=1` mode.
-
-In that mode the app:
-
-- seeds deterministic sample events from local fixtures at startup
-- materializes offline feature snapshots into DuckDB
-- serves the existing read-only FastAPI endpoints
-- does not require a live Redpanda or Redis stack
-
-That keeps the hosted demo honest: it shows the platform outputs, not the entire local infrastructure.
+This project focuses on a real production failure mode: stale, inconsistent, or schema-broken features reaching training and inference systems. When online and offline feature values drift apart, teams get bad predictions, misleading experiments, and hard-to-debug regressions in production.
 
 ## Production Problem
 
@@ -36,6 +14,19 @@ This repo shows that operational loop in a concrete way:
 - materialize the same feature logic into DuckDB and Redis
 - compare freshness, schema compatibility, and reconciliation
 - expose a serving API that downstream inference clients can trust
+
+## Hosted demo mode
+
+Render runs this repo in `HOSTED_DEMO=1` mode.
+
+In that mode the app:
+
+- seeds deterministic sample events from local fixtures at startup
+- materializes offline feature snapshots into DuckDB
+- serves the existing read-only FastAPI endpoints
+- does not require a live Redpanda or Redis stack
+
+That keeps the hosted demo honest: it shows the platform outputs, not the entire local infrastructure.
 
 ## Project goals
 
