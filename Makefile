@@ -2,7 +2,7 @@ PYTHON ?= python3.12
 HOST ?= 0.0.0.0
 PORT ?= 8010
 
-.PHONY: setup up down test produce consume materialize serve run-all clean-data reset-local demo-bootstrap
+.PHONY: setup up down test produce consume materialize export-training serve run-all clean-data reset-local demo-bootstrap
 
 setup:
 	$(PYTHON) -m pip install -r requirements.txt
@@ -24,6 +24,9 @@ consume:
 
 materialize:
 	$(PYTHON) -m src.features.materialize_features
+
+export-training:
+	$(PYTHON) -m src.training.export_dataset
 
 serve:
 	$(PYTHON) -m uvicorn src.serving.api:app --host $(HOST) --port $(PORT)
