@@ -5,6 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
+    hosted_demo: bool = Field(default=False, alias="HOSTED_DEMO")
     postgres_url: str = Field(
         default="postgresql://platform_user:platform_pass@localhost:5432/feature_platform",
         alias="POSTGRES_URL",
@@ -16,6 +17,12 @@ class Settings(BaseSettings):
     supported_schema_versions: str = Field(default="1.0.0", alias="SUPPORTED_SCHEMA_VERSIONS")
     freshness_warning_lag_seconds: int = Field(default=300, alias="FRESHNESS_WARNING_LAG_SECONDS")
     freshness_error_lag_seconds: int = Field(default=1800, alias="FRESHNESS_ERROR_LAG_SECONDS")
+    demo_seed_users: int = Field(default=12, alias="DEMO_SEED_USERS")
+    demo_events_per_user: int = Field(default=16, alias="DEMO_EVENTS_PER_USER")
+    demo_sample_events_path: str = Field(
+        default="data/generated/sample_events.jsonl",
+        alias="DEMO_SAMPLE_EVENTS_PATH",
+    )
 
 
 settings = Settings()

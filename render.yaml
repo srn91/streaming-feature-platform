@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: streaming-feature-platform-demo
+    runtime: python
+    plan: free
+    region: oregon
+    branch: main
+    repo: https://github.com/srn91/streaming-feature-platform
+    autoDeploy: true
+    buildCommand: python3 -m pip install -r requirements.txt
+    startCommand: HOSTED_DEMO=1 make serve
+    healthCheckPath: /health
+    envVars:
+      - key: HOSTED_DEMO
+        value: "1"
+      - key: DEMO_SEED_USERS
+        value: "12"
+      - key: DEMO_EVENTS_PER_USER
+        value: "16"
+      - key: DEMO_SAMPLE_EVENTS_PATH
+        value: data/generated/sample_events.jsonl
+      - key: PYTHON_VERSION
+        value: 3.12.0

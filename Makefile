@@ -1,6 +1,8 @@
 PYTHON ?= python3.12
+HOST ?= 0.0.0.0
+PORT ?= 8010
 
-.PHONY: setup up down test produce consume materialize run-all clean-data reset-local
+.PHONY: setup up down test produce consume materialize serve run-all clean-data reset-local demo-bootstrap
 
 setup:
 	$(PYTHON) -m pip install -r requirements.txt
@@ -22,6 +24,12 @@ consume:
 
 materialize:
 	$(PYTHON) -m src.features.materialize_features
+
+serve:
+	$(PYTHON) -m uvicorn src.serving.api:app --host $(HOST) --port $(PORT)
+
+demo-bootstrap:
+	HOSTED_DEMO=1 $(PYTHON) -m src.demo.bootstrap
 
 run-all: produce consume materialize
 

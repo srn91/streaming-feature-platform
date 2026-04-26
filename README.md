@@ -13,6 +13,19 @@ This project focuses on the kinds of problems that show up in real-world data pl
 - data quality and reconciliation
 - feature freshness and serving reliability
 
+## Hosted demo mode
+
+Render should run this repo in `HOSTED_DEMO=1` mode.
+
+In that mode the app:
+
+- seeds deterministic sample events from local fixtures at startup
+- materializes offline feature snapshots into DuckDB
+- serves the existing read-only FastAPI endpoints
+- does not require a live Redpanda or Redis stack
+
+That keeps the hosted demo honest: it shows the platform outputs, not the entire local infrastructure.
+
 ## Production Problem
 
 The real problem is keeping online and offline feature values aligned while the source data is still changing.
@@ -89,6 +102,19 @@ make test
 
 That is the path a reviewer should use on any laptop with Docker and Python installed.
 
+For the Render-hosted demo, use:
+
+```bash
+HOSTED_DEMO=1 make serve
+```
+
+That path bootstraps deterministic events, materializes offline features, and serves:
+
+- `GET /`
+- `GET /health`
+- `GET /features/{entity_id}`
+- `GET /quality/summary`
+
 Current browser endpoints:
 
 - `http://localhost:8010/`
@@ -157,6 +183,13 @@ open -a Docker
 
 Wait until Docker Desktop is fully started before running `docker compose`.
 
+Before running the hosted demo on Render:
+
+1. use the blueprint in [`render.yaml`](render.yaml)
+2. set `HOSTED_DEMO=1`
+3. keep the start command as `make serve`
+4. do not provision Redpanda or Redis for the hosted service
+
 If your machine has multiple Python versions and one of them causes package build problems, use Python 3.12 explicitly:
 
 ```bash
@@ -185,6 +218,8 @@ make materialize
 API will be exposed at:
 
 `http://localhost:8010`
+
+On Render, the same API is exposed on the service URL Render assigns.
 
 Browser-friendly endpoints:
 
@@ -218,6 +253,14 @@ If dependency installation fails:
 - this milestone does not require Postgres client libraries yet
 - the current runnable path uses Redpanda, DuckDB, Redis, and FastAPI
 - use the updated `requirements.txt` and install again
+
+Render deployment notes:
+
+- build command: `python3 -m pip install -r requirements.txt`
+- start command: `HOSTED_DEMO=1 make serve`
+- health check path: `/health`
+- the hosted demo is read-only and artifact-backed
+- the hosted demo uses deterministic fixtures, so the output is stable across redeploys
 
 Key env knobs:
 
