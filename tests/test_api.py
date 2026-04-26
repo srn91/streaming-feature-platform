@@ -34,3 +34,12 @@ def test_training_dataset_summary() -> None:
     payload = response.json()
     assert "rows" in payload
     assert "positive_labels" in payload
+
+
+def test_metrics_endpoint() -> None:
+    client.get("/quality/summary")
+    client.get("/training-dataset/summary")
+    response = client.get("/metrics")
+    assert response.status_code == 200
+    assert "streaming_feature_platform_http_requests_total" in response.text
+    assert "streaming_feature_platform_training_dataset_rows" in response.text

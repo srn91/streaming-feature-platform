@@ -1,58 +1,24 @@
-# Milestones
+# Service Walkthrough
 
-## Milestone 1: local platform skeleton
+## Infrastructure layer
 
-Deliverables:
+- Docker Compose wires the local Redpanda, Redis, and API stack
+- the `Dockerfile` packages the hosted-demo service path
+- Kubernetes, AWS ECS, Azure Container Apps, and Jenkins assets live under `infra/` and the repo root
 
-- Docker Compose stack
-- Redpanda
-- Redis
-- Postgres or DuckDB setup
-- simple event schema
-- sample event generator
+## Streaming and storage layer
 
-## Milestone 2: streaming ingestion
+- the producer generates deterministic sample events
+- the consumer persists raw events into DuckDB
+- materialization writes offline snapshots and updates Redis
 
-Deliverables:
+## Quality and reconciliation layer
 
-- producer writes sample events
-- consumer reads events
-- typed event models
-- raw event persistence
+- schema version checks gate incompatible events
+- null, duplicate, freshness, and reconciliation checks surface pipeline health
+- the training-dataset export is derived from the latest offline snapshot plus event labels
 
-## Milestone 3: feature computation
+## Serving and observability layer
 
-Deliverables:
-
-- rolling aggregates
-- online store writes
-- offline store writes
-- basic feature definitions
-
-## Milestone 4: quality and reconciliation
-
-Deliverables:
-
-- schema validation
-- null and duplicate checks
-- freshness checks
-- online/offline feature comparison
-
-## Milestone 5: serving API
-
-Deliverables:
-
-- FastAPI service
-- feature lookup endpoint
-- health endpoint
-- freshness metadata
-
-## Milestone 6: polish and portfolio
-
-Deliverables:
-
-- diagrams
-- screenshots
-- tests
-- metrics summary
-- crisp README update
+- FastAPI exposes feature lookups, quality summaries, training-dataset summaries, and metrics
+- `/metrics` publishes request, ingestion, feature-snapshot, and training-dataset counters/gauges for scraping

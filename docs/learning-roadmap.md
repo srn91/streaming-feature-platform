@@ -1,8 +1,8 @@
-# Learning Roadmap
+# System Concepts
 
-This document is for you to learn the project like a beginner while building it.
+This note explains the concepts the repo exercises so the implementation choices are easier to follow.
 
-## What you need to understand by the end
+## Core concepts
 
 ### Data Engineer skills
 
@@ -22,7 +22,7 @@ This document is for you to learn the project like a beginner while building it.
 - feature freshness
 - why low-latency serving matters
 
-## Learning order
+## Concept flow
 
 ### Step 1: event streaming basics
 
@@ -34,9 +34,9 @@ Learn:
 - consumer group
 - offset
 
-Goal:
+Outcome:
 
-You should be able to explain how an event gets from a producer into a consumer.
+You can trace how an event moves from a producer into a consumer.
 
 ### Step 2: feature platform basics
 
@@ -48,9 +48,9 @@ Learn:
 - online feature store
 - offline feature store
 
-Goal:
+Outcome:
 
-You should be able to explain why the same feature needs two paths.
+You can explain why the same feature needs online and offline paths.
 
 ### Step 3: data quality
 
@@ -62,9 +62,9 @@ Learn:
 - reconciliation
 - schema validation
 
-Goal:
+Outcome:
 
-You should be able to explain how you know the pipeline is correct.
+You can explain how the repo checks that the pipeline output is correct.
 
 ### Step 4: serving and reliability
 
@@ -75,20 +75,10 @@ Learn:
 - cache-like access patterns
 - monitoring
 
-Goal:
+Outcome:
 
-You should be able to explain how downstream systems consume features.
+You can explain how downstream systems consume feature values.
 
-## How we will work
+## Practical summary
 
-For each milestone, do three things:
-
-1. build the component
-2. explain it in plain English
-3. write down interview-style talking points
-
-## Minimum interview explanation you should be able to give
-
-`I built a streaming feature platform that ingests raw user events, computes rolling features, stores them in Redis for online serving and DuckDB/Parquet for offline use, and runs reconciliation checks to reduce training-serving skew.`
-
-If you can explain that cleanly, you are already much stronger for DE and ML Engineer interviews.
+This repository demonstrates a feature platform that ingests raw user events, computes rolling features, stores them in Redis for online serving and DuckDB for offline use, and runs reconciliation checks to reduce training-serving skew.

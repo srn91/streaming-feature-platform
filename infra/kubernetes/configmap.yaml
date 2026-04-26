@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: streaming-feature-platform-config
+data:
+  HOSTED_DEMO: "1"
+  DEMO_SEED_USERS: "12"
+  DEMO_EVENTS_PER_USER: "16"
+  DEMO_SAMPLE_EVENTS_PATH: "data/generated/sample_events.jsonl"

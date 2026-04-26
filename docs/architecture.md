@@ -90,30 +90,17 @@ FastAPI service exposing:
 - freshness metadata
 - reconciliation status
 
-## Versioned build path
+## Shipped platform shape
 
-### V1
+The current repo packages:
 
-- synthetic events
-- Redpanda ingestion
-- Python consumers
-- Redis online store
-- DuckDB offline store
-- FastAPI serving
-
-### V2
-
-- schema registry style validation
-- drift and freshness dashboards
-- batch backfill job
-- more realistic feature definitions
-
-### V3
-
-- Spark Structured Streaming version
-- CI tests
-- container health checks
-- observability stack
+- synthetic events for deterministic local and hosted-demo runs
+- Redpanda ingestion for the full local stack
+- Python consumers and materialization jobs
+- Redis online feature reads
+- DuckDB offline feature snapshots
+- FastAPI serving plus a Prometheus-style `/metrics` surface
+- container, Kubernetes, AWS ECS, Azure Container Apps, and Jenkins deployment assets for the hosted-demo API
 
 ## Design choices
 
@@ -133,6 +120,6 @@ It gives a fast local analytics path and makes the project easy to run on a lapt
 
 Many candidates build pipelines that move data.
 
-Far fewer build systems that prove the data is correct.
+Far fewer build systems make the data-quality checks explicit.
 
 That is one of the strongest signals this project should send.
