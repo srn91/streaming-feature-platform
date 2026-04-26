@@ -7,6 +7,7 @@ from src.demo.bootstrap import bootstrap_hosted_demo
 from src.features.offline_store import latest_feature_snapshot
 from src.features.online_store import read_feature_snapshot
 from src.quality.checks import build_quality_summary
+from src.training.export_dataset import export_training_dataset_as_dict
 
 
 @asynccontextmanager
@@ -32,7 +33,7 @@ def root(request: Request) -> dict[str, object]:
         "status": "running",
         "mode": "hosted_demo" if settings.hosted_demo else "local_full_stack",
         "demo_bootstrapped": demo_bootstrap is not None,
-        "available_endpoints": ["/health", "/features/{entity_id}", "/quality/summary"],
+        "available_endpoints": ["/health", "/features/{entity_id}", "/quality/summary", "/training-dataset/summary"],
         "example_entity_id": "user_0001",
     }
 
@@ -61,3 +62,8 @@ def get_features(entity_id: str) -> dict[str, object]:
 @app.get("/quality/summary")
 def quality_summary() -> dict[str, object]:
     return build_quality_summary()
+
+
+@app.get("/training-dataset/summary")
+def training_dataset_summary() -> dict[str, object]:
+    return export_training_dataset_as_dict()

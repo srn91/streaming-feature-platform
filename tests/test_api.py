@@ -26,3 +26,11 @@ def test_quality_summary() -> None:
     assert "validations" in payload
     assert "schema_compatibility" in payload
     assert "freshness" in payload
+
+
+def test_training_dataset_summary() -> None:
+    response = client.get("/training-dataset/summary")
+    assert response.status_code == 200
+    payload = response.json()
+    assert "rows" in payload
+    assert "positive_labels" in payload

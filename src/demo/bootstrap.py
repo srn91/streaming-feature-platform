@@ -7,6 +7,7 @@ from src.connectors.generate_sample_events import generate_events, write_jsonl
 from src.features.materialize_features import materialize_features
 from src.features.offline_store import feature_snapshot_count
 from src.pipelines.raw_event_store import raw_event_count, persist_raw_event
+from src.training.export_dataset import export_training_dataset
 
 
 @dataclass(frozen=True)
@@ -16,6 +17,7 @@ class DemoBootstrapResult:
     feature_snapshot_count: int
     sample_events_path: str
     materialized_features: int
+    training_dataset_rows: int
 
 
 def bootstrap_hosted_demo(
@@ -41,6 +43,7 @@ def bootstrap_hosted_demo(
     materialized_features = 0
     if raw_event_count() > 0 and feature_snapshot_count() == 0:
         materialized_features = materialize_features(write_online=False)
+    training_dataset = export_training_dataset()
 
     return DemoBootstrapResult(
         seeded_events=seeded_events,
@@ -48,6 +51,7 @@ def bootstrap_hosted_demo(
         feature_snapshot_count=feature_snapshot_count(),
         sample_events_path=str(path),
         materialized_features=materialized_features,
+        training_dataset_rows=training_dataset.rows,
     )
 
 

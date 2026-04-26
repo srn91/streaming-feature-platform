@@ -78,6 +78,7 @@ This repo already runs end to end locally:
 - raw events are persisted into DuckDB
 - feature snapshots are materialized into offline and online stores
 - FastAPI serves feature lookup and quality status
+- a training dataset export is produced from the latest offline snapshot plus event-derived labels
 - validation, schema compatibility, freshness, and online/offline reconciliation are exposed through the API
 
 The most portable local run sequence is:
@@ -88,6 +89,7 @@ make up
 make produce
 make consume
 make materialize
+make export-training
 make test
 ```
 
@@ -105,12 +107,14 @@ That path bootstraps deterministic events, materializes offline features, and se
 - `GET /health`
 - `GET /features/{entity_id}`
 - `GET /quality/summary`
+- `GET /training-dataset/summary`
 
 Current browser endpoints:
 
 - `http://localhost:8010/`
 - `http://localhost:8010/features/user_0001`
 - `http://localhost:8010/quality/summary`
+- `http://localhost:8010/training-dataset/summary`
 
 ## Repo structure
 
@@ -202,6 +206,7 @@ make up
 make produce
 make consume
 make materialize
+make export-training
 ```
 
 `make setup` is pinned to Python 3.12 so the native `duckdb` and `confluent-kafka` wheels install cleanly on a reviewer laptop.
@@ -230,6 +235,7 @@ Browser-friendly endpoints:
 - `http://localhost:8010/health`
 - `http://localhost:8010/features/user_0001`
 - `http://localhost:8010/quality/summary`
+- `http://localhost:8010/training-dataset/summary`
 
 Quality checks currently include:
 
@@ -240,6 +246,7 @@ Quality checks currently include:
 - duplicate and null-field validation
 - freshness lag with configurable warning and error thresholds
 - online/offline reconciliation against Redis
+- training-dataset export built from the latest offline snapshot plus purchase labels from raw events
 
 To run the tests:
 
@@ -287,6 +294,7 @@ Then rerun:
 make produce
 make consume
 make materialize
+make export-training
 ```
 
 ## First implementation scope
@@ -299,6 +307,7 @@ Version 1 should be small but real:
 - write online features into Redis
 - write offline features into DuckDB or Parquet
 - expose a `/features/{entity_id}` API
+- export a training dataset from the most recent offline snapshot
 - run a reconciliation job between online and offline values
 
 That is enough to prove the architecture without pretending the repo is a full enterprise feature platform.
