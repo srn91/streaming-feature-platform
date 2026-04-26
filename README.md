@@ -44,7 +44,7 @@ flowchart LR
     I --> K["Training / inference clients"]
 ```
 
-See [docs/architecture.md](/Users/sathwikraonadipelli/Desktop/RESUMES/projects/streaming-feature-platform/docs/architecture.md) for the detailed system design.
+See [docs/architecture.md](docs/architecture.md) for the detailed system design.
 
 ## Current status
 
@@ -83,8 +83,8 @@ streaming-feature-platform/
 For more detail:
 
 1. [docs/architecture.md](/Users/sathwikraonadipelli/Desktop/RESUMES/projects/streaming-feature-platform/docs/architecture.md)
-2. [docs/learning-roadmap.md](/Users/sathwikraonadipelli/Desktop/RESUMES/projects/streaming-feature-platform/docs/learning-roadmap.md)
-3. [docs/milestones.md](/Users/sathwikraonadipelli/Desktop/RESUMES/projects/streaming-feature-platform/docs/milestones.md)
+2. [docs/learning-roadmap.md](docs/learning-roadmap.md)
+3. [docs/milestones.md](docs/milestones.md)
 
 ## Initial tech stack
 
