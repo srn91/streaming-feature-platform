@@ -52,6 +52,7 @@ def test_build_quality_summary(tmp_path, monkeypatch) -> None:
     assert summary["raw_events"]["total_events"] == 3
     assert summary["features"]["total_feature_snapshots"] == 1
     assert summary["features"]["latest_snapshot_entities"] == 1
+    assert summary["schema_compatibility"]["status"] == "ok"
     assert summary["freshness"]["status"] == "ok"
     assert summary["reconciliation"]["status"] in {"skipped", "ok", "mismatch"}
 

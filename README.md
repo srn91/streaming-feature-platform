@@ -87,7 +87,7 @@ This repo already runs end to end locally:
 - raw events are persisted into DuckDB
 - feature snapshots are materialized into offline and online stores
 - FastAPI serves feature lookup and quality status
-- validation, freshness, and online/offline reconciliation are exposed through the API
+- validation, schema compatibility, freshness, and online/offline reconciliation are exposed through the API
 
 The most portable local run sequence is:
 
@@ -245,6 +245,7 @@ Quality checks currently include:
 - raw event volume and entity coverage
 - historical feature row count versus latest snapshot coverage
 - supported schema version enforcement
+- explicit schema compatibility reporting with accepted and rejected versions
 - duplicate and null-field validation
 - freshness lag with configurable warning and error thresholds
 - online/offline reconciliation against Redis
@@ -275,6 +276,7 @@ Render deployment notes:
 - the hosted demo is read-only and artifact-backed
 - the hosted demo uses deterministic fixtures, so the output is stable across redeploys
 - the hosted reconciliation section is expected to report Redis as skipped, because the hosted demo does not provision the online store
+- the hosted quality summary includes schema compatibility details so reviewers can see exactly which schema versions were accepted or rejected
 
 Key env knobs:
 

@@ -153,3 +153,9 @@ def test_validation_summary_detects_unsupported_schema_versions(tmp_path, monkey
     assert summary["validations"]["unsupported_schema_version_count"] == 1
     assert summary["validations"]["schema_versions_seen"] == ["1.0.0", "2.0.0"]
     assert summary["validations"]["unsupported_schema_versions"] == ["2.0.0"]
+    assert summary["schema_compatibility"]["status"] == "warning"
+    assert summary["schema_compatibility"]["supported_versions"] == ["1.0.0"]
+    assert summary["schema_compatibility"]["compatible_versions"] == ["1.0.0"]
+    assert summary["schema_compatibility"]["incompatible_versions"] == ["2.0.0"]
+    assert summary["schema_compatibility"]["compatible_event_count"] == 1
+    assert summary["schema_compatibility"]["incompatible_event_count"] == 1

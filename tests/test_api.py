@@ -24,4 +24,5 @@ def test_quality_summary() -> None:
     payload = response.json()
     assert "raw_events" in payload
     assert "validations" in payload
+    assert "schema_compatibility" in payload
     assert "freshness" in payload

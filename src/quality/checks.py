@@ -45,6 +45,18 @@ class ValidationSummary:
     unsupported_schema_versions: list[str]
 
 
+@dataclass
+class SchemaCompatibilitySummary:
+    supported_versions: list[str]
+    schema_versions_seen: list[str]
+    compatible_versions: list[str]
+    incompatible_versions: list[str]
+    compatible_event_count: int
+    incompatible_event_count: int
+    status: str
+    recommended_action: str
+
+
 def _supported_schema_versions() -> set[str]:
     return {
         version.strip()
@@ -212,6 +224,64 @@ def validation_summary() -> ValidationSummary:
     )
 
 
+def schema_compatibility_summary() -> SchemaCompatibilitySummary:
+    initialize_raw_events_table()
+    supported_versions = sorted(_supported_schema_versions())
+    with duckdb.connect(str(RAW_DB_PATH), read_only=False) as conn:
+        schema_versions_seen = [
+            row[0]
+            for row in conn.execute(
+                """
+                SELECT DISTINCT schema_version
+                FROM raw_events
+                WHERE schema_version IS NOT NULL AND schema_version != ''
+                ORDER BY schema_version
+                """
+            ).fetchall()
+        ]
+
+        compatible_versions = [version for version in schema_versions_seen if version in supported_versions]
+        incompatible_versions = [version for version in schema_versions_seen if version not in supported_versions]
+
+        compatible_event_count = conn.execute(
+            """
+            SELECT COUNT(*)
+            FROM raw_events
+            WHERE schema_version IN ({placeholders})
+            """.format(placeholders=", ".join("?" for _ in compatible_versions)),
+            compatible_versions,
+        ).fetchone()[0] if compatible_versions else 0
+
+        incompatible_event_count = conn.execute(
+            """
+            SELECT COUNT(*)
+            FROM raw_events
+            WHERE schema_version IS NOT NULL
+              AND schema_version != ''
+              AND schema_version IN ({placeholders})
+            """.format(placeholders=", ".join("?" for _ in incompatible_versions)),
+            incompatible_versions,
+        ).fetchone()[0] if incompatible_versions else 0
+
+    status = "ok" if not incompatible_versions else "warning"
+    recommended_action = (
+        "All observed schema versions are supported."
+        if status == "ok"
+        else "Block new producers until the unsupported schema versions are remediated."
+    )
+
+    return SchemaCompatibilitySummary(
+        supported_versions=supported_versions,
+        schema_versions_seen=schema_versions_seen,
+        compatible_versions=compatible_versions,
+        incompatible_versions=incompatible_versions,
+        compatible_event_count=int(compatible_event_count or 0),
+        incompatible_event_count=int(incompatible_event_count or 0),
+        status=status,
+        recommended_action=recommended_action,
+    )
+
+
 def _latest_feature_rows(limit: int = 25) -> list[tuple]:
     with duckdb.connect(str(FEATURE_DB_PATH), read_only=False) as conn:
         return conn.execute(
@@ -361,10 +431,12 @@ def build_quality_summary() -> dict[str, Any]:
     raw = raw_event_summary()
     features = feature_summary()
     validations = validation_summary()
+    schema_compatibility = schema_compatibility_summary()
     return {
         "raw_events": asdict(raw),
         "features": asdict(features),
         "validations": asdict(validations),
+        "schema_compatibility": asdict(schema_compatibility),
         "freshness": freshness_summary(),
         "reconciliation": online_offline_reconciliation(),
     }
