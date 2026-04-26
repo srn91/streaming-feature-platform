@@ -151,7 +151,7 @@ Recommended commands:
 ```bash
 git clone https://github.com/srn91/streaming-feature-platform.git
 cd streaming-feature-platform
-python3 -m pip install -r requirements.txt
+python3.12 -m pip install -r requirements.txt
 open -a Docker
 ```
 
@@ -162,7 +162,7 @@ If your machine has multiple Python versions and one of them causes package buil
 ```bash
 git clone https://github.com/srn91/streaming-feature-platform.git
 cd streaming-feature-platform
-/usr/local/bin/python3.12 -m venv .venv
+python3.12 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
@@ -179,6 +179,8 @@ make produce
 make consume
 make materialize
 ```
+
+`make setup` is pinned to Python 3.12 so the native `duckdb` and `confluent-kafka` wheels install cleanly on a reviewer laptop.
 
 API will be exposed at:
 
