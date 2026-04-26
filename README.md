@@ -13,6 +13,17 @@ This project focuses on the kinds of problems that show up in real-world data pl
 - data quality and reconciliation
 - feature freshness and serving reliability
 
+## Production Problem
+
+The real problem is keeping online and offline feature values aligned while the source data is still changing.
+
+This repo shows that operational loop in a concrete way:
+
+- stream events into Redpanda
+- materialize the same feature logic into DuckDB and Redis
+- compare freshness, schema compatibility, and reconciliation
+- expose a serving API that downstream inference clients can trust
+
 ## Project goals
 
 By the end of this project, the repo should demonstrate:
@@ -46,6 +57,15 @@ flowchart LR
 
 See [docs/architecture.md](docs/architecture.md) for the detailed system design.
 
+Operationally, the flow is:
+
+1. application or synthetic events arrive
+2. Redpanda buffers the stream
+3. a consumer writes raw events into DuckDB
+4. feature materialization updates offline snapshots and the Redis online store
+5. quality checks compare freshness and online/offline consistency
+6. FastAPI serves the latest feature state to clients
+
 ## Current status
 
 This repo already runs end to end locally:
@@ -55,6 +75,19 @@ This repo already runs end to end locally:
 - feature snapshots are materialized into offline and online stores
 - FastAPI serves feature lookup and quality status
 - validation, freshness, and online/offline reconciliation are exposed through the API
+
+The most portable local run sequence is:
+
+```bash
+make setup
+make up
+make produce
+make consume
+make materialize
+make test
+```
+
+That is the path a reviewer should use on any laptop with Docker and Python installed.
 
 Current browser endpoints:
 
@@ -215,6 +248,8 @@ Version 1 should be small but real:
 - write offline features into DuckDB or Parquet
 - expose a `/features/{entity_id}` API
 - run a reconciliation job between online and offline values
+
+That is enough to prove the architecture without pretending the repo is a full enterprise feature platform.
 
 ## Sample feature ideas
 
