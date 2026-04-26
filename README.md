@@ -259,6 +259,7 @@ Render deployment notes:
 - build command: `python3 -m pip install -r requirements.txt`
 - start command: `HOSTED_DEMO=1 make serve`
 - health check path: `/health`
+- Python runtime is pinned to `3.12.7` in `runtime.txt`
 - the hosted demo is read-only and artifact-backed
 - the hosted demo uses deterministic fixtures, so the output is stable across redeploys
 
