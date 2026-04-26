@@ -221,6 +221,18 @@ API will be exposed at:
 
 On Render, the same API is exposed on the service URL Render assigns.
 
+## Hosted Deployment
+
+- Live URL: [https://streaming-feature-platform-demo.onrender.com](https://streaming-feature-platform-demo.onrender.com)
+- First path to open: `/quality/summary`
+- Browser smoke result: after the initial Render wake-up, `/quality/summary` loaded in a real browser and returned the live raw-event, feature-snapshot, freshness, and reconciliation payload.
+- First direct API checks that returned `200` after wake-up:
+  - `/health`
+  - `/features/user_0001`
+  - `/quality/summary`
+
+This hosted service is intentionally a read-only demo mode. It seeds deterministic sample events, materializes feature snapshots into DuckDB, and serves the same FastAPI endpoints as the local stack without provisioning Redpanda or Redis.
+
 Browser-friendly endpoints:
 
 - `http://localhost:8010/`
@@ -259,9 +271,10 @@ Render deployment notes:
 - build command: `python3 -m pip install -r requirements.txt`
 - start command: `HOSTED_DEMO=1 make serve`
 - health check path: `/health`
-- Python runtime is pinned to `3.12.7` in `runtime.txt`
+- Python runtime is pinned with `.python-version` so Render builds this service on Python `3.12.x`
 - the hosted demo is read-only and artifact-backed
 - the hosted demo uses deterministic fixtures, so the output is stable across redeploys
+- the hosted reconciliation section is expected to report Redis as skipped, because the hosted demo does not provision the online store
 
 Key env knobs:
 
