@@ -23,6 +23,15 @@ class Settings(BaseSettings):
         default="data/generated/sample_events.jsonl",
         alias="DEMO_SAMPLE_EVENTS_PATH",
     )
+    gcp_project_id: str = Field(default="streaming-feature-platform", alias="GCP_PROJECT_ID")
+    gcp_pubsub_topic: str = Field(default="feature-events", alias="GCP_PUBSUB_TOPIC")
+    gcp_bigquery_dataset: str = Field(default="feature_platform", alias="GCP_BIGQUERY_DATASET")
+    gcp_bigquery_raw_events_table: str = Field(default="raw_events", alias="GCP_BIGQUERY_RAW_EVENTS_TABLE")
+    gcp_bigquery_feature_snapshots_table: str = Field(
+        default="feature_snapshots",
+        alias="GCP_BIGQUERY_FEATURE_SNAPSHOTS_TABLE",
+    )
+    gcp_asset_output_dir: str = Field(default="data/generated/gcp", alias="GCP_ASSET_OUTPUT_DIR")
 
 
 settings = Settings()

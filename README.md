@@ -1,6 +1,6 @@
 # streaming-feature-platform
 
-An end-to-end feature platform that ingests event streams, materializes online and offline features, reconciles consistency under streaming updates, serves low-latency feature reads, and exposes operational metrics for downstream ML systems.
+An end-to-end feature platform that ingests event streams, materializes online and offline features, reconciles consistency under streaming updates, serves low-latency feature reads, exposes operational metrics for downstream ML systems, and generates local GCP Pub/Sub and BigQuery dry-run assets from the same deterministic event stream.
 
 This repo focuses on a production failure mode that directly affects ranking, recommendation, and inference systems: stale or inconsistent features reaching training and online scoring paths at different times.
 
@@ -37,9 +37,9 @@ Operationally, the repo has two execution modes:
 1. full local stack with Redpanda, Redis, DuckDB, and FastAPI
 2. hosted demo mode that bootstraps deterministic sample events and serves the same read-only API surface without provisioning the entire stream
 
-## Current Capabilities
+## Capabilities
 
-This repo currently supports:
+This repo supports:
 
 - event production into Redpanda
 - raw event persistence in DuckDB
@@ -48,7 +48,8 @@ This repo currently supports:
 - offline training-dataset export from the latest snapshot plus event-derived labels
 - schema compatibility checks and freshness/reconciliation validation
 - Prometheus-style metrics at `GET /metrics`
-- container, Kubernetes, AWS ECS, Azure Container Apps, and Jenkins deployment assets for the hosted-demo service path
+- local GCP Pub/Sub and BigQuery dry-run assets generated from the deterministic demo stream
+- `GET /gcp/readiness` for generating and inspecting the local GCP bundle from the API surface
 
 ## Run Steps
 
@@ -79,7 +80,28 @@ That path bootstraps deterministic events, materializes offline features, and se
 - `GET /features/{entity_id}`
 - `GET /quality/summary`
 - `GET /training-dataset/summary`
+- `GET /gcp/readiness`
 - `GET /metrics`
+
+### GCP dry-run assets
+
+Generate the Pub/Sub and BigQuery dry-run bundle locally without any Google credentials:
+
+```bash
+make gcp-dry-run
+```
+
+That writes a reproducible asset bundle under `data/generated/gcp/`:
+
+- `pubsub_topic.json`
+- `pubsub_messages.jsonl`
+- `bigquery_raw_events.sql`
+- `bigquery_feature_snapshots.sql`
+- `bigquery_raw_events.jsonl`
+- `bigquery_feature_snapshots.jsonl`
+- `dry_run_summary.json`
+
+The dry-run path is local-only. It does not call Pub/Sub or BigQuery APIs, but it does generate the exact message envelope, table DDL, and row shapes that the repo would publish and load in GCP.
 
 ### Browser endpoints
 
@@ -87,6 +109,7 @@ That path bootstraps deterministic events, materializes offline features, and se
 - `http://localhost:8010/features/user_0001`
 - `http://localhost:8010/quality/summary`
 - `http://localhost:8010/training-dataset/summary`
+- `http://localhost:8010/gcp/readiness`
 - `http://localhost:8010/metrics`
 
 ## Repo Layout
@@ -117,6 +140,7 @@ streaming-feature-platform/
 - Docker Compose
 - pytest
 - Prometheus metrics
+- GCP Pub/Sub and BigQuery dry-run assets
 
 ## Prerequisites
 
@@ -154,17 +178,16 @@ API will be exposed at:
 
 ## Cloud and Infrastructure Assets
 
-The repo includes deployment and operations assets for the hosted-demo service path:
+The repo includes deployment and operations assets for the shipped local and hosted demo paths, plus a concrete GCP handoff lane:
 
 - `Dockerfile` for a single-container FastAPI deployment
 - `docker-compose.yml` for the local multi-service stack
 - `infra/kubernetes/` for a small Deployment + Service + ConfigMap
-- `infra/aws/ecs-task-definition.json` for an ECS/Fargate-style deployment
-- `infra/azure/container-app.yaml` for Azure Container Apps
+- `infra/gcp/` for Cloud Run, Pub/Sub topic, and BigQuery schema assets
 - `infra/observability/prometheus.yml` for scraping `/metrics`
-- `Jenkinsfile` for a simple install/lint/test/container-build pipeline
+- `data/generated/gcp/` for the local GCP Pub/Sub and BigQuery dry-run bundle
 
-These assets are intentionally scoped to the read-only hosted-demo path. The full local developer stack still uses Docker Compose with Redpanda and Redis.
+These assets are intentionally scoped to the read-only demo and local developer paths. The full local developer stack still uses Docker Compose with Redpanda and Redis.
 
 ## Hosted Deployment
 
@@ -189,7 +212,7 @@ Browser-friendly endpoints:
 
 ## Validation
 
-The repo currently verifies:
+The repo verifies:
 
 - raw event volume and entity coverage
 - latest feature snapshot coverage
@@ -197,6 +220,7 @@ The repo currently verifies:
 - duplicate and null-field validation
 - freshness lag and online/offline reconciliation
 - training-dataset export from the latest offline snapshot plus purchase labels
+- local GCP Pub/Sub and BigQuery dry-run asset generation
 - Prometheus metrics emission for API traffic, quality summaries, and training-dataset exports
 
 Local quality gates:
@@ -214,7 +238,7 @@ make test
 If dependency installation fails:
 
 - this milestone does not require Postgres client libraries yet
-- the current runnable path uses Redpanda, DuckDB, Redis, and FastAPI
+- the current runnable path uses Redpanda, DuckDB, Redis, FastAPI, and the local GCP dry-run exporter
 - use the updated `requirements.txt` and install again
 
 Render deployment notes:
@@ -233,6 +257,12 @@ Key env knobs:
 - `SUPPORTED_SCHEMA_VERSIONS`
 - `FRESHNESS_WARNING_LAG_SECONDS`
 - `FRESHNESS_ERROR_LAG_SECONDS`
+- `GCP_PROJECT_ID`
+- `GCP_PUBSUB_TOPIC`
+- `GCP_BIGQUERY_DATASET`
+- `GCP_BIGQUERY_RAW_EVENTS_TABLE`
+- `GCP_BIGQUERY_FEATURE_SNAPSHOTS_TABLE`
+- `GCP_ASSET_OUTPUT_DIR`
 
 If a local data file becomes corrupted after an interrupted run:
 

@@ -36,6 +36,15 @@ def test_training_dataset_summary() -> None:
     assert "positive_labels" in payload
 
 
+def test_gcp_readiness_endpoint() -> None:
+    response = client.get("/gcp/readiness")
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["project_id"] == "streaming-feature-platform"
+    assert payload["pubsub_messages"] > 0
+    assert payload["feature_snapshot_rows"] > 0
+
+
 def test_metrics_endpoint() -> None:
     client.get("/quality/summary")
     client.get("/training-dataset/summary")

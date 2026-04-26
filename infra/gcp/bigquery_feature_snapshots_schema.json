@@ -1,0 +1,13 @@
+[
+  {"name": "entity_id", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "as_of_ts", "type": "TIMESTAMP", "mode": "REQUIRED"},
+  {"name": "feature_version", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "clicks_1h", "type": "INTEGER", "mode": "REQUIRED"},
+  {"name": "sessions_24h", "type": "INTEGER", "mode": "REQUIRED"},
+  {"name": "purchase_value_24h", "type": "FLOAT", "mode": "REQUIRED"},
+  {"name": "last_active_ts", "type": "TIMESTAMP", "mode": "REQUIRED"},
+  {"name": "click_to_impression_ratio_24h", "type": "FLOAT", "mode": "REQUIRED"},
+  {"name": "dominant_category", "type": "STRING", "mode": "NULLABLE"},
+  {"name": "dominant_category_share", "type": "FLOAT", "mode": "REQUIRED"},
+  {"name": "source", "type": "STRING", "mode": "REQUIRED"}
+]
