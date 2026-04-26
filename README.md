@@ -82,7 +82,7 @@ streaming-feature-platform/
 
 For more detail:
 
-1. [docs/architecture.md](/Users/sathwikraonadipelli/Desktop/RESUMES/projects/streaming-feature-platform/docs/architecture.md)
+1. [docs/architecture.md](docs/architecture.md)
 2. [docs/learning-roadmap.md](docs/learning-roadmap.md)
 3. [docs/milestones.md](docs/milestones.md)
 
@@ -116,7 +116,7 @@ Before running the project locally:
 Recommended commands:
 
 ```bash
-git clone git@github.com:srn91/streaming-feature-platform.git
+git clone https://github.com/srn91/streaming-feature-platform.git
 cd streaming-feature-platform
 python3 -m pip install -r requirements.txt
 open -a Docker
@@ -127,7 +127,7 @@ Wait until Docker Desktop is fully started before running `docker compose`.
 If your machine has multiple Python versions and one of them causes package build problems, use Python 3.12 explicitly:
 
 ```bash
-git clone git@github.com:srn91/streaming-feature-platform.git
+git clone https://github.com/srn91/streaming-feature-platform.git
 cd streaming-feature-platform
 /usr/local/bin/python3.12 -m venv .venv
 source .venv/bin/activate
@@ -138,7 +138,7 @@ python -m pip install -r requirements.txt
 ## Quick start
 
 ```bash
-git clone git@github.com:srn91/streaming-feature-platform.git
+git clone https://github.com/srn91/streaming-feature-platform.git
 cd streaming-feature-platform
 make setup
 make up
