@@ -2,7 +2,7 @@ PYTHON ?= python3.12
 HOST ?= 0.0.0.0
 PORT ?= 8010
 
-.PHONY: setup up down test produce consume materialize export-training serve run-all clean-data reset-local demo-bootstrap
+.PHONY: setup up down test produce consume materialize export-training serve run-all clean-data reset-local demo-bootstrap gcp-dry-run
 
 setup:
 	$(PYTHON) -m pip install -r requirements.txt
@@ -33,6 +33,9 @@ serve:
 
 demo-bootstrap:
 	HOSTED_DEMO=1 $(PYTHON) -m src.demo.bootstrap
+
+gcp-dry-run:
+	$(PYTHON) -m src.gcp.dry_run
 
 run-all: produce consume materialize
 

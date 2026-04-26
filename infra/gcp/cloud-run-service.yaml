@@ -1,0 +1,30 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: streaming-feature-platform
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: "0"
+        autoscaling.knative.dev/maxScale: "3"
+    spec:
+      containerConcurrency: 20
+      containers:
+        - image: us-central1-docker.pkg.dev/PROJECT_ID/platform/streaming-feature-platform:latest
+          env:
+            - name: HOSTED_DEMO
+              value: "1"
+            - name: GCP_PROJECT_ID
+              value: "PROJECT_ID"
+            - name: GCP_PUBSUB_TOPIC
+              value: "feature-events"
+            - name: GCP_BIGQUERY_DATASET
+              value: "feature_platform"
+            - name: GCP_BIGQUERY_RAW_EVENTS_TABLE
+              value: "raw_events"
+            - name: GCP_BIGQUERY_FEATURE_SNAPSHOTS_TABLE
+              value: "feature_snapshots"
+          ports:
+            - name: http1
+              containerPort: 8010

@@ -1,0 +1,8 @@
+{
+  "project_id": "PROJECT_ID",
+  "topic_id": "feature-events",
+  "message_format": "json",
+  "ordering_enabled": true,
+  "ordering_key_field": "entity_id",
+  "payload_shape": "UserEvent"
+}

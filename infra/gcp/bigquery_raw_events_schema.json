@@ -1,0 +1,14 @@
+[
+  {"name": "event_id", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "entity_id", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "event_type", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "event_ts", "type": "TIMESTAMP", "mode": "REQUIRED"},
+  {"name": "schema_version", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "session_id", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "page", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "product_id", "type": "STRING", "mode": "NULLABLE"},
+  {"name": "category", "type": "STRING", "mode": "NULLABLE"},
+  {"name": "price", "type": "FLOAT", "mode": "NULLABLE"},
+  {"name": "attributes_json", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "source", "type": "STRING", "mode": "REQUIRED"}
+]
