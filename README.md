@@ -19,7 +19,6 @@ This repo focuses on a production failure mode that directly affects ranking, re
 - Feature freshness and online/offline consistency are first-class platform concerns.
 - The same feature logic supports streaming updates, online serving, and offline training exports.
 - Data quality checks are exposed through an API surface instead of being hidden in notebooks.
-- The repo maps directly to AI Data Engineer, Senior Data Engineer, Feature Platform, and ML data pipeline roles.
 
 ## Problem
 
@@ -72,7 +71,7 @@ This repo supports:
 
 - The full local stack uses Redpanda and Redis for a realistic developer workflow, while the hosted demo intentionally skips those services and serves a deterministic read-only slice instead of pretending to be a full production deployment.
 - DuckDB keeps offline snapshots portable and easy to inspect on a laptop, but it is a local analytics choice rather than a replacement for a warehouse or lakehouse engine at higher scale.
-- Feature materialization stays Python-first so the core logic is easy to read in one repo, but that also means the current pipeline prioritizes clarity and interview-defensible architecture over throughput tuning.
+- Feature materialization stays Python-first so the core logic is easy to read in one repo, but that also means the current pipeline prioritizes clarity and readable architecture over throughput tuning.
 - The GCP path is a dry-run handoff that generates message envelopes, schema artifacts, and load-ready files locally; it does not provision or call live cloud services from this repo.
 
 ## Run Steps
