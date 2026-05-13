@@ -68,6 +68,13 @@ This repo supports:
 - local GCP Pub/Sub and BigQuery dry-run assets generated from the deterministic demo stream
 - `GET /gcp/readiness` for generating and inspecting the local GCP bundle from the API surface
 
+## Tradeoffs
+
+- The full local stack uses Redpanda and Redis for a realistic developer workflow, while the hosted demo intentionally skips those services and serves a deterministic read-only slice instead of pretending to be a full production deployment.
+- DuckDB keeps offline snapshots portable and easy to inspect on a laptop, but it is a local analytics choice rather than a replacement for a warehouse or lakehouse engine at higher scale.
+- Feature materialization stays Python-first so the core logic is easy to read in one repo, but that also means the current pipeline prioritizes clarity and interview-defensible architecture over throughput tuning.
+- The GCP path is a dry-run handoff that generates message envelopes, schema artifacts, and load-ready files locally; it does not provision or call live cloud services from this repo.
+
 ## Run Steps
 
 ### Full local stack
@@ -280,6 +287,13 @@ Key env knobs:
 - `GCP_BIGQUERY_RAW_EVENTS_TABLE`
 - `GCP_BIGQUERY_FEATURE_SNAPSHOTS_TABLE`
 - `GCP_ASSET_OUTPUT_DIR`
+
+## Next Steps
+
+- Add a managed-stream adapter so the same ingestion contract can target Kafka, Pub/Sub, or Redpanda without changing feature logic.
+- Persist feature lineage and backfill metadata so operators can trace a served value to the exact raw-event window and materialization run that produced it.
+- Expand schema governance from version allowlists into field-level compatibility policies with richer break-glass exception handling.
+- Add dashboarded latency and freshness SLO views on top of the existing `/metrics` surface for a more operations-ready demo story.
 
 If a local data file becomes corrupted after an interrupted run:
 
