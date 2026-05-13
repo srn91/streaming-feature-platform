@@ -4,9 +4,9 @@ An end-to-end feature platform that ingests event streams, materializes online a
 
 This repo focuses on a production failure mode that directly affects ranking, recommendation, and inference systems: stale or inconsistent features reaching training and online scoring paths at different times.
 
-## Proof Snapshot
+## Results
 
-| Signal | Current evidence |
+| Area | Details |
 |---|---|
 | End-to-end data path | Deterministic events flow through Redpanda/Kafka-compatible ingestion, DuckDB raw storage, feature materialization, Redis online serving, and FastAPI feature reads. |
 | Feature reliability | `/quality/summary` reports raw-event counts, feature-snapshot coverage, freshness lag, duplicate/null checks, schema compatibility, and reconciliation status. |
@@ -14,7 +14,7 @@ This repo focuses on a production failure mode that directly affects ranking, re
 | Cloud transferability | `make gcp-dry-run` generates Pub/Sub message envelopes, BigQuery DDL, JSONL rows, and a dry-run summary without requiring GCP credentials. |
 | Observability | `/metrics` emits Prometheus-style metrics for API traffic, quality summaries, training-dataset exports, and operational checks. |
 
-## What This Proves
+## Overview
 
 - Feature freshness and online/offline consistency are first-class platform concerns.
 - The same feature logic supports streaming updates, online serving, and offline training exports.
