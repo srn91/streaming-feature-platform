@@ -214,8 +214,8 @@ These assets are intentionally scoped to the read-only demo and local developer 
 
 ## Hosted Deployment
 
-- Live API: [`/health`](https://streaming-feature-platform-demo.onrender.com/health)
-- First path to open: `/quality/summary`
+- Live API: [`/quality/summary`](https://streaming-feature-platform-demo.onrender.com/quality/summary)
+- Health check: [`/health`](https://streaming-feature-platform-demo.onrender.com/health)
 - Browser smoke result: after the initial Render wake-up, `/quality/summary` loaded in a real browser and returned the live raw-event, feature-snapshot, freshness, and reconciliation payload.
 - First direct API checks that returned `200` after wake-up:
   - `/health`
