@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 from time import perf_counter
 
 from fastapi import FastAPI, Request, Response
+from fastapi.responses import HTMLResponse
 
 from src.config import settings
 from src.demo.bootstrap import bootstrap_hosted_demo
@@ -41,24 +42,34 @@ async def metrics_middleware(request: Request, call_next):
     return response
 
 
-@app.get("/")
-def root(request: Request) -> dict[str, object]:
+@app.get("/", response_class=HTMLResponse)
+def root(request: Request) -> str:
     demo_bootstrap = getattr(request.app.state, "demo_bootstrap", None)
-    return {
-        "project": "streaming-feature-platform",
-        "status": "running",
-        "mode": "hosted_demo" if settings.hosted_demo else "local_full_stack",
-        "demo_bootstrapped": demo_bootstrap is not None,
-        "available_endpoints": [
-            "/health",
-            "/features/{entity_id}",
-            "/quality/summary",
-            "/training-dataset/summary",
-            "/gcp/readiness",
-            "/metrics",
-        ],
-        "example_entity_id": "user_0001",
-    }
+    mode = "hosted demo" if settings.hosted_demo else "local full stack"
+    bootstrap_status = "loaded" if demo_bootstrap is not None else "not loaded"
+    return f"""<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Streaming Feature Platform</title>
+<style>body{{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;max-width:860px;margin:48px auto;padding:0 24px;line-height:1.5;color:#111}}a{{color:#0645ad}}code{{background:#f3f4f6;padding:2px 5px;border-radius:4px}}</style></head>
+<body>
+<h1>Streaming Feature Platform</h1>
+<p>Read-only hosted demo for a feature platform with event ingestion, feature materialization, quality checks, and monitoring output.</p>
+<ul>
+<li>Status: running</li>
+<li>Mode: {mode}</li>
+<li>Demo data: {bootstrap_status}</li>
+</ul>
+<h2>Open endpoints</h2>
+<ul>
+<li><a href="/health">Health check</a></li>
+<li><a href="/features/user_0001">Sample feature lookup</a></li>
+<li><a href="/quality/summary">Quality summary</a></li>
+<li><a href="/training-dataset/summary">Training dataset summary</a></li>
+<li><a href="/gcp/readiness">GCP readiness dry run</a></li>
+<li><a href="/metrics">Prometheus metrics</a></li>
+</ul>
+</body></html>"""
 
 
 @app.get("/health")

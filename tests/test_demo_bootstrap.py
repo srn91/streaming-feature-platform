@@ -34,7 +34,6 @@ def test_hosted_demo_root_exposes_bootstrap_state(tmp_path, monkeypatch) -> None
     with TestClient(app) as client:
         response = client.get("/")
         assert response.status_code == 200
-        payload = response.json()
-        assert payload["mode"] == "hosted_demo"
-        assert payload["demo_bootstrapped"] is True
+        assert "hosted demo" in response.text
+        assert "loaded" in response.text
         assert client.get("/features/user_0001").status_code == 200

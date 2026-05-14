@@ -9,7 +9,9 @@ client = TestClient(app)
 def test_root() -> None:
     response = client.get("/")
     assert response.status_code == 200
-    assert response.json()["project"] == "streaming-feature-platform"
+    assert "text/html" in response.headers["content-type"]
+    assert "Streaming Feature Platform" in response.text
+    assert "/quality/summary" in response.text
 
 
 def test_health() -> None:
