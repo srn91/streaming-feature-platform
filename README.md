@@ -4,6 +4,9 @@ An end-to-end feature platform that ingests event streams, materializes online a
 
 This repo focuses on a production failure mode that directly affects ranking, recommendation, and inference systems: stale or inconsistent features reaching training and online scoring paths at different times.
 
+**System type:** Production-style engineering system  
+**System brief:** [docs/system-brief.md](docs/system-brief.md)
+
 ## Results
 
 | Area | Details |
